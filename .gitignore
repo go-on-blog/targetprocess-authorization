@@ -1,0 +1,9 @@
+*.log
+.DS_Store
+coverage
+doc
+native
+node_modules
+Thumbs.db
+*.sublime-workspace
+*.sublime-project

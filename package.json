@@ -1,0 +1,19 @@
+{
+  "name": "tp-authorization-cli",
+  "version": "0.0.1",
+  "description": "Targetprocess authorization Command Line Interface tool",
+  "author": "Guillaume Oriol <guillaume@go-on.blog>",
+  "scripts": {
+    "lint": "jslint --edition=latest --node \"lib/**/*.js\"",
+    "lint:bin": "jslint --edition=latest --node \"bin/**/*.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/go-on-blog/tp-authorization-cli.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "minimist": "latest",
+    "when": "latest"
+  }
+}

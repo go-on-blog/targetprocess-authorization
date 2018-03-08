@@ -1,0 +1,17 @@
+Usage:
+  npm run assign -u <user> -p <project> -r <role>
+
+Assigns a user to a project with the specified role.
+
+Options:
+
+  -h --help                     Display the information you are looking at.
+
+  -p <project> --project=<name> Project the user must be assigned to.
+
+  -r <role> --role=<name>       Role under which the user must be assigned
+                                to the project.
+
+  -u <name> --user=<name>       User that is to be assigned.
+
+  -v --version                  Show the version of this program.
