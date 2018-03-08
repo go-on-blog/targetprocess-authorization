@@ -5,7 +5,9 @@
   "author": "Guillaume Oriol <guillaume@go-on.blog>",
   "scripts": {
     "lint": "jslint --edition=latest --node \"lib/**/*.js\"",
-    "lint:bin": "jslint --edition=latest --node \"bin/**/*.js\""
+    "lint:bin": "jslint --edition=latest --node \"bin/**/*.js\"",
+    "lint:test": "jslint --edition=latest --node \"test/**/*.js\"",
+    "test": "mocha --recursive"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,10 @@
   "dependencies": {
     "minimist": "latest",
     "when": "latest"
+  },
+  "devDependencies": {
+    "chai": "latest",
+    "jslint": "latest",
+    "mocha": "latest"
   }
 }
