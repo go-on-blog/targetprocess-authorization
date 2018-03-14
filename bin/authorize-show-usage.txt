@@ -1,0 +1,26 @@
+Usage:
+  npm run authorize-show -u <user> -p <project>
+
+Show under which role a user is assigned to a project.
+
+Options:
+
+  -d --domain=<value>           Your Targetprocess instance.
+                                For instance "mycompany.tpondemand.com".
+
+  -h --help                     Display the information you are looking at.
+
+  -p <project> --project=<name> Project you want to show role for.
+                                If the project is missing, you'll get the
+                                full list of projects the user is assigned
+                                to.
+
+  -t --token=<value>            Authentication token.
+                                To get a security token, request the
+                                Authentication REST service using:
+                                https://<domain>/api/v1/Authentication
+
+  -u <name> --user=<name>       User you want to show roles. 
+                                This argument is required.
+
+  -v --version                  Show the version of this program.

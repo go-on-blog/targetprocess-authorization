@@ -1,21 +1,26 @@
 {
-  "name": "tp-authorization-cli",
+  "name": "targetprocess-authorization",
   "version": "0.0.1",
   "description": "Targetprocess authorization Command Line Interface tool",
-  "author": "Guillaume Oriol <guillaume@go-on.blog>",
+  "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
+  "license": "MIT",
   "scripts": {
     "lint": "jslint --edition=latest --node \"lib/**/*.js\"",
     "lint:bin": "jslint --edition=latest --node \"bin/**/*.js\"",
     "lint:test": "jslint --edition=latest --node \"test/**/*.js\"",
-    "test": "mocha --recursive"
+    "test": "npm run lint:test && npm run lint && mocha test --recursive"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/go-on-blog/tp-authorization-cli.git"
+    "url": "https://github.com/go-on-blog/targetprocess-authorization.git"
   },
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/go-on-blog/targetprocess-authorization/issues"
+  },
   "dependencies": {
+    "chai-as-promised": "^7.1.1",
     "minimist": "latest",
+    "targetprocess-api": "^0.1.0",
     "when": "latest"
   },
   "devDependencies": {
