@@ -18,9 +18,10 @@
     "url": "https://github.com/go-on-blog/targetprocess-authorization/issues"
   },
   "dependencies": {
+    "@stamp/it": "^1.0.3",
     "chai-as-promised": "^7.1.1",
     "minimist": "latest",
-    "targetprocess-api": "^0.1.0",
+    "targetprocess-api": "^0.1.3",
     "when": "latest"
   },
   "devDependencies": {
