@@ -5,9 +5,9 @@
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
   "scripts": {
-    "lint": "jslint --edition=latest --node \"lib/**/*.js\"",
-    "lint:bin": "jslint --edition=latest --node \"bin/**/*.js\"",
-    "lint:test": "jslint --edition=latest --node \"test/**/*.js\"",
+    "lint": "jslint --edition=latest \"lib/**/*.js\"",
+    "lint:bin": "jslint --edition=latest \"bin/**/*.js\"",
+    "lint:test": "jslint --edition=latest \"test/**/*.js\"",
     "test": "npm run lint:test && npm run lint && mocha test --recursive"
   },
   "repository": {
@@ -19,14 +19,14 @@
   },
   "dependencies": {
     "@stamp/it": "^1.0.3",
-    "chai-as-promised": "^7.1.1",
-    "minimist": "latest",
+    "minimist": "^1.2.0",
     "targetprocess-api": "^0.1.3",
-    "when": "latest"
+    "when": "^3.7.8"
   },
   "devDependencies": {
-    "chai": "latest",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "jslint": "latest",
-    "mocha": "latest"
+    "mocha": "^5.0.4"
   }
 }
