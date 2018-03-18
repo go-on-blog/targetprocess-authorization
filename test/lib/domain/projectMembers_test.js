@@ -5,7 +5,7 @@
 
 const {describe, it} = require("mocha");
 
-describe("projectMembers", function () {
+describe.skip("projectMembers", function () {
     const chai = require("chai");
     const expect = chai.expect;
     const chaiAsPromised = require("chai-as-promised");

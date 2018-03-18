@@ -9,47 +9,34 @@ describe("resources", function () {
     const chai = require("chai");
     const expect = chai.expect;
     const chaiAsPromised = require("chai-as-promised");
+    const sinon = require("sinon");
+    const resourceName = "Projects";
     const resources = require("../../../lib/domain/resources");
-    const credentials = require("../../credentials");
+    const {domain, token} = require("../../credentials");
+    const uri = `https://${domain}/api/v1`;
+    const retrieve = require("targetprocess-api/retrieve")(uri, token, resourceName);
     const stampit = require("@stamp/it");
-    var projectName;
-    var projectId;
-    var bugName;
-    var bugIds = [];
+    const factory = stampit(resources, {props: {retrieve}});
+    var stub;
 
     chai.use(chaiAsPromised);
 
-    this.timeout(5000);
-
     before(function () {
-        const tp = require("targetprocess-api")(credentials);
-
-        function addBug(projectId, name) {
-            return tp.create("Bugs", {"Project": {"Id": projectId}, "Name": name}).then(function (item) {
-                bugIds.push(item.Id);
-                return item;
-            });
-        }
-
-        projectName = Math.random().toString(36).replace(/[^a-z]+/g, "");
-        bugName = Math.random().toString(36).replace(/[^a-z]+/g, "");
-        return tp.create("Projects", {"Name": projectName}).then(function (item) {
-            const when = require("when");
-
-            projectId = item.Id;
-            return when.all(addBug(projectId, bugName), addBug(projectId, bugName));
-        });
+        stub = sinon.stub(retrieve, "get");
+        stub.onFirstCall().returns(Promise.resolve([]));
+        stub.onSecondCall().returns(Promise.resolve([{Id: 1}]));
+        stub.onThirdCall().returns(Promise.resolve([{Id: 2}, {Id: 3}]));
     });
 
     describe("getId", function () {
-        it("should return a fulfilled promise when the name includes a single quote", function () {
-            const projects = stampit().props({resource: "Projects"});
-            const factory = stampit(resources, projects);
-            const sut = factory(credentials);
-            const hasQuote = "isn't it";
+        // it("should return a fulfilled promise when the name includes a single quote", function () {
+        //     const projects = stampit().props({resource: "Projects"});
+        //     const factory = stampit(resources, projects);
+        //     const sut = factory(credentials);
+        //     const hasQuote = "isn't it";
 
-            return expect(sut.getId(hasQuote)).to.be.fulfilled;
-        });
+        //     return expect(sut.getId(hasQuote)).to.be.fulfilled;
+        // });
 
         it("should return null when no resource of that name is found", function () {
             // Not finding the expected resource should not be considered as an
@@ -57,45 +44,33 @@ describe("resources", function () {
             // resource on purpose. So we don't reject the promise but return
             // a failure value (null).
             // See https://github.com/domenic/promises-unwrapping/blob/master/docs/writing-specifications-with-promises.md#rejections-should-be-used-for-exceptional-situations
-            const projects = stampit().props({resource: "Projects"});
-            const factory = stampit(resources, projects);
-            const sut = factory(credentials);
-            const doesNotExist = Math.random().toString(36).replace(/[^a-z]+/g, "");
+            const sut = factory();
 
-            return expect(sut.getId(doesNotExist)).to.eventually.be.null;
+            return expect(sut.getId("first call"))
+                .to.eventually.be.null;
         });
 
         it("should return a number when one single resource of that name is found", function () {
-            const projects = stampit().props({resource: "Projects"});
-            const factory = stampit(resources, projects);
-            const sut = factory(credentials);
+            const sut = factory();
 
-            return expect(sut.getId(projectName))
+            return expect(sut.getId("second call"))
                 .to.eventually.be.a("number")
-                .and.to.equal(projectId);
+                .and.to.equal(1);
         });
 
         it("should return an array of numbers when multiple resources of that name are found", function () {
-            const bugs = stampit().props({resource: "Bugs"});
-            const factory = stampit(resources, bugs);
-            const sut = factory(credentials);
+            const sut = factory();
 
-            return expect(sut.getId(bugName))
+            return expect(sut.getId("third call"))
                 .to.eventually.be.an("array")
                 .and.to.have.lengthOf(2)
-                .and.to.have.members(bugIds);
+                .and.to.have.members([2, 3]);
         });
+
 
     });
 
     after(function () {
-        const tp = require("targetprocess-api")(credentials);
-        const when = require("when");
-
-        return when.all(
-            tp.remove("Bugs", bugIds[0]),
-            tp.remove("Bugs", bugIds[1]),
-            tp.remove("Projects", projectId)
-        );
+        stub.restore();
     });
 });
