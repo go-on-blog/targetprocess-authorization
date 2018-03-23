@@ -1,17 +1,16 @@
 /*jslint
-    es6, this
+    es6
 */
 "use strict";
 
 const {describe, it} = require("mocha");
 
-describe("resources", function () {
+describe("getId", function () {
     const chai = require("chai");
     const expect = chai.expect;
     const chaiAsPromised = require("chai-as-promised");
     const sinon = require("sinon");
-    const stampit = require("@stamp/it");
-    const factory = require("../../../lib/domain/resources");
+    const factory = require("../../../lib/domain/getId");
     const credentials = require("../../credentials");
     const config = Object.assign({resource: "UserStories"}, credentials);
 
@@ -21,6 +20,7 @@ describe("resources", function () {
         function getSUT(args, value) {
             const request = sinon.stub();
             const retrieve = require("targetprocess-api/retrieve")(Object.assign({request}, config));
+            const stampit = require("@stamp/it");
             const stamp = stampit(factory, {props: {retrieve}});
 
             request.rejects();

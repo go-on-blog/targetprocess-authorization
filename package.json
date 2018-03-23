@@ -20,14 +20,14 @@
   "dependencies": {
     "@stamp/it": "^1.0.3",
     "minimist": "^1.2.0",
-    "targetprocess-api": "^0.1.4",
+    "targetprocess-api": "^0.1.6",
     "when": "^3.7.8"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "jslint": "latest",
-    "mocha": "^5.0.4",
-    "sinon": "^4.4.6"
+    "mocha": "^5.0.5",
+    "sinon": "^4.4.8"
   }
 }

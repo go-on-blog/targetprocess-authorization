@@ -3,49 +3,47 @@
 */
 "use strict";
 
-const {after, before, describe, it} = require("mocha");
+const {describe, it} = require("mocha");
 
-describe.skip("users", function () {
+describe("users", function () {
     const chai = require("chai");
     const expect = chai.expect;
     const chaiAsPromised = require("chai-as-promised");
-    const users = require("../../../lib/domain/users");
+    const sinon = require("sinon");
+    const factory = require("../../../lib/domain/users");
     const credentials = require("../../credentials");
-    const userName = Math.random().toString(36).replace(/[^a-z]+/g, "");
-    var userId;
 
     chai.use(chaiAsPromised);
 
-    this.timeout(5000);
-
-    before(function () {
-        const tp = require("targetprocess-api")(credentials);
-        const obj = {
-            "FirstName": "Abraham",
-            "LastName": userName,
-            "Email": `${userName}@go-on.blog`,
-            "Login": "abcd",
-            "Password": "efgh"
-        };
-
-        return tp.create("Users", obj).then(function (item) {
-            userId = item.Id;
-            return item;
-        });
-    });
-
     describe("getId", function () {
-        it("should return a number represented the id of the user created", function () {
-            const sut = users(credentials);
+        function getSUT(args, value) {
+            const request = sinon.stub();
+            const retrieve = require("targetprocess-api/retrieve")(Object.assign({request, resource: "Users"}, credentials));
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {retrieve}});
 
-            return expect(sut.getId(userName))
+            request.rejects();
+            request.withArgs(args).resolves(value);
+
+            return stamp();
+        }
+
+        it("should return the user id matching the specified last name", function () {
+            const lastName = "x";
+            const args = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/Users/`,
+                qs: {
+                    token: credentials.token,
+                    where: `LastName eq '${lastName}'`
+                },
+                json: true
+            };
+            const sut = getSUT(args, {Items: [{Id: 42}]});
+
+            return expect(sut.getId(lastName))
                 .to.eventually.be.a("number")
-                .and.to.equal(userId);
+                .and.to.equal(42);
         });
-    });
-
-    after(function () {
-        const tp = require("targetprocess-api")(credentials);
-        return tp.remove("Users", userId);
     });
 });
