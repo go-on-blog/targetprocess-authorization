@@ -1,10 +1,11 @@
 {
   "name": "targetprocess-authorization",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Targetprocess authorization Command Line Interface tool",
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
   "scripts": {
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
     "lint": "jslint --edition=latest \"lib/**/*.js\"",
     "lint:bin": "jslint --edition=latest \"bin/**/*.js\"",
     "lint:test": "jslint --edition=latest \"test/**/*.js\"",
@@ -26,8 +27,13 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "codecov": "latest",
+    "istanbul": "latest",
     "jslint": "latest",
     "mocha": "^5.0.5",
     "sinon": "^4.4.8"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   }
 }
