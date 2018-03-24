@@ -5,7 +5,7 @@
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
   "scripts": {
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec --recursive",
     "lint": "jslint --edition=latest \"lib/**/*.js\"",
     "lint:bin": "jslint --edition=latest \"bin/**/*.js\"",
     "lint:test": "jslint --edition=latest \"test/**/*.js\"",
