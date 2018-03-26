@@ -16,48 +16,56 @@ describe("projectMembers", function () {
 
     chai.use(chaiAsPromised);
 
-    describe("getUserId", function () {
-        function getSUT(args, value) {
+    describe("getId", function () {
+        function getStub(args, value) {
             const getId = sinon.stub();
-            const users = {getId};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {users}});
 
             getId.withArgs(args).resolves(value);
 
-            return stamp(config);
+            return {
+                resource: "Users",
+                getId
+            };
         }
+
+        it("should eventually return undefined when no argument is given", function () {
+            const sut = factory(config);
+            return expect(sut.getId(null, undefined)).to.eventually.be.undefined;
+        });
 
         it("should eventually return its argument when it is a number", function () {
             const sut = factory(config);
             const id = 1;
 
-            return expect(sut.getUserId(id)).to.eventually.equal(id);
+            return expect(sut.getId(null, id)).to.eventually.equal(id);
         });
 
         it("should return a rejected promise when the given name matches several users", function () {
+            const sut = factory(config);
             const veryCommonLastName = "Smith";
-            const sut = getSUT(veryCommonLastName, [1, 2]);
+            const stub = getStub(veryCommonLastName, [1, 2]);
 
-            return expect(sut.getUserId(veryCommonLastName)).to.be.rejected;
+            return expect(sut.getId(stub, veryCommonLastName))
+                .to.be.rejected;
         });
 
         it("should eventually return an identifier matching the given name", function () {
+            const sut = factory(config);
             const name = "x";
-            const sut = getSUT(name, 42);
+            const stub = getStub(name, 42);
 
-            return expect(sut.getUserId(name))
+            return expect(sut.getId(stub, name))
                 .to.eventually.be.a("number")
                 .and.to.equal(42);
         });
     });
 
     describe("show", function () {
-        function getSUT(args, value) {
+        function getSUT(users, projects, args, value) {
             const request = sinon.stub();
             const retrieve = require("targetprocess-api/retrieve")(Object.assign({request}, config));
             const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {retrieve}});
+            const stamp = stampit(factory, {props: {retrieve, users, projects}});
 
             request.rejects();
             request.withArgs(args).resolves(value);
@@ -95,9 +103,12 @@ describe("projectMembers", function () {
                     }
                 ]
             };
-            const sut = getSUT(args, expected);
-            const getUserId = sinon.stub(sut, "getUserId");
-            getUserId.withArgs(name).resolves(id);
+            const users = {};
+            const projects = {};
+            const sut = getSUT(users, projects, args, expected);
+            const getId = sinon.stub(sut, "getId");
+            getId.withArgs(users, name).resolves(id);
+            getId.withArgs(projects, 2).resolves(2);
 
             return expect(sut.show(name, 2))
                 .to.eventually.be.a("string")
@@ -148,9 +159,11 @@ describe("projectMembers", function () {
                     }
                 ]
             };
-            const sut = getSUT(args, expected);
-            const getUserId = sinon.stub(sut, "getUserId");
-            getUserId.withArgs(name).resolves(id);
+            const users = {};
+            const projects = {};
+            const sut = getSUT(users, projects, args, expected);
+            const getId = sinon.stub(sut, "getId");
+            getId.withArgs(users, name).resolves(id);
 
             return expect(sut.show(name))
                 .to.eventually.be.a("string")
