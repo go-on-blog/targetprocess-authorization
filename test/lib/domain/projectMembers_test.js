@@ -60,12 +60,12 @@ describe("projectMembers", function () {
         });
     });
 
-    describe("show", function () {
+    describe("getItems", function () {
         function getSUT(users, projects, args, value) {
             const request = sinon.stub();
-            const retrieve = require("targetprocess-api/retrieve")(Object.assign({request}, config));
+            const retriever = require("targetprocess-api/retrieve")(Object.assign({request}, config));
             const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {retrieve, users, projects}});
+            const stamp = stampit(factory, {props: {retriever, users, projects}});
 
             request.rejects();
             request.withArgs(args).resolves(value);
@@ -73,7 +73,7 @@ describe("projectMembers", function () {
             return stamp(config);
         }
 
-        it("should return a string matching given user name and project id", function () {
+        it("should return an array with a single item matching given user name and project id", function () {
             const name = "Bourne";
             const id = 1;
             const args = {
@@ -110,12 +110,12 @@ describe("projectMembers", function () {
             getId.withArgs(users, name).resolves(id);
             getId.withArgs(projects, 2).resolves(2);
 
-            return expect(sut.show(name, 2))
-                .to.eventually.be.a("string")
-                .and.to.equal("Jason Bourne is assigned to Treadstone with the Developer role.\n");
+            return expect(sut.getItems(name, 2))
+                .to.eventually.be.an("array")
+                .and.to.deep.equal(expected.Items);
         });
 
-        it("should return a string matching given user name", function () {
+        it("should return an array with several items matching the given user name", function () {
             const name = "Bourne";
             const id = 1;
             const args = {
@@ -165,12 +165,66 @@ describe("projectMembers", function () {
             const getId = sinon.stub(sut, "getId");
             getId.withArgs(users, name).resolves(id);
 
-            return expect(sut.show(name))
+            return expect(sut.getItems(name))
+                .to.eventually.be.an("array")
+                .and.to.deep.equal(expected.Items);
+        });
+    });
+
+    describe("show", function () {
+        it("should return a string matching given user and project", function () {
+            const userName = "Bourne";
+            const projectName = "Treadstone";
+            const sut = factory(config);
+            const getItems = sinon.stub(sut, "getItems");
+            getItems.withArgs(userName, projectName).resolves([
+                {
+                    User: {
+                        Id: 1,
+                        FirstName: "Jason",
+                        LastName: userName
+                    },
+                    Project: {
+                        Id: 2,
+                        Name: projectName
+                    },
+                    Role: {
+                        Name: "Developer"
+                    }
+                }
+            ]);
+
+            return expect(sut.show(userName, projectName))
                 .to.eventually.be.a("string")
-                .and.to.equal(
-                    "Jason Bourne is assigned to Treadstone with the Developer role.\n" +
-                    "Jason Bourne is assigned to Blackbriar with the Developer role.\n"
-                );
+                .and.to.equal("Jason Bourne is assigned to Treadstone with the Developer role.\n");
+        });
+    });
+
+    describe("unassign", function () {
+        it("should return a fulfilled promise once the given user has been unassigned from the given project", function () {
+            const userName = "Bourne";
+            const projectName = "Treadstone";
+            const batchRemove = sinon.stub();
+            const remover = {batchRemove};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {remover}});
+            const sut = stamp(config);
+            const getItems = sinon.stub(sut, "getItems");
+            const response = {ResourceType: "ProjectMember", Id: 42};
+
+            getItems.withArgs(userName, projectName).resolves([
+                {
+                    Id: 42,
+                    User: {Id: 1, FirstName: "Jason", LastName: userName},
+                    Project: {Id: 2, Name: projectName},
+                    Role: {Id: 3, Name: "Developer"}
+                }
+            ]);
+
+            batchRemove.withArgs([42]).resolves(response);
+
+            return expect(sut.unassign(userName, projectName))
+                .to.eventually.equal(response);
         });
     });
 });

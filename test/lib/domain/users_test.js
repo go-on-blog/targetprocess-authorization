@@ -18,9 +18,9 @@ describe("users", function () {
     describe("getId", function () {
         function getSUT(args, value) {
             const request = sinon.stub();
-            const retrieve = require("targetprocess-api/retrieve")(Object.assign({request, resource: "Users"}, credentials));
+            const retriever = require("targetprocess-api/retrieve")(Object.assign({request, resource: "Users"}, credentials));
             const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {retrieve}});
+            const stamp = stampit(factory, {props: {retriever}});
 
             request.rejects();
             request.withArgs(args).resolves(value);
