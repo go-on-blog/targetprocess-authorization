@@ -1,5 +1,5 @@
 /*jslint
-    es6, this
+    es6
 */
 "use strict";
 

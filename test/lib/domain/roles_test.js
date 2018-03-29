@@ -5,12 +5,12 @@
 
 const {describe, it} = require("mocha");
 
-describe("users", function () {
+describe("roles", function () {
     const chai = require("chai");
     const expect = chai.expect;
     const chaiAsPromised = require("chai-as-promised");
     const sinon = require("sinon");
-    const factory = require("../../../lib/domain/users");
+    const factory = require("../../../lib/domain/roles");
     const credentials = require("../../credentials");
 
     chai.use(chaiAsPromised);
@@ -18,7 +18,7 @@ describe("users", function () {
     describe("getId", function () {
         function getSUT(args, value) {
             const request = sinon.stub();
-            const retriever = require("targetprocess-api/retrieve")(Object.assign({request, resource: "Users"}, credentials));
+            const retriever = require("targetprocess-api/retrieve")(Object.assign({request, resource: "Roles"}, credentials));
             const stampit = require("@stamp/it");
             const stamp = stampit(factory, {props: {retriever}});
 
@@ -28,20 +28,20 @@ describe("users", function () {
             return stamp();
         }
 
-        it("should return the user id matching the specified last name", function () {
-            const lastName = "x";
+        it("should return the role id matching the specified name", function () {
+            const name = "Developer";
             const args = {
                 method: "GET",
-                uri: `https://${credentials.domain}/api/v1/Users/`,
+                uri: `https://${credentials.domain}/api/v1/Roles/`,
                 qs: {
                     token: credentials.token,
-                    where: `LastName eq '${lastName}'`
+                    where: `Name eq '${name}'`
                 },
                 json: true
             };
             const sut = getSUT(args, {Items: [{Id: 42}]});
 
-            return expect(sut.getId(lastName))
+            return expect(sut.getId(name))
                 .to.eventually.be.a("number")
                 .and.to.equal(42);
         });

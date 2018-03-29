@@ -227,4 +227,52 @@ describe("projectMembers", function () {
                 .to.eventually.equal(response);
         });
     });
+
+    describe("assign", function () {
+        it("should return a rejected promise if the user is undefined", function () {
+            const sut = factory(config);
+            return expect(sut.assign(undefined, "Project", "Role")).to.be.rejected;
+        });
+
+        it("should return a rejected promise if the project is undefined", function () {
+            const sut = factory(config);
+            return expect(sut.assign("User", undefined, "Role")).to.be.rejected;
+        });
+
+        it("should unassign prior assignment", function () {
+            const create = sinon.stub();
+            const creator = {create};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {creator}});
+            const sut = stamp(config);
+            const unassign = sinon.stub(sut, "unassign");
+
+            unassign.withArgs(1, 2).resolves({});
+            create.resolves({});
+
+            sut.assign(1, 2, 3);
+            return expect(unassign.calledWith(1, 2));
+        });
+
+        it("should eventually assign the given user to the given project", function () {
+            const create = sinon.stub();
+            const creator = {create};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {creator}});
+            const sut = stamp(config);
+            const unassign = sinon.stub(sut, "unassign");
+            const response = {ResourceType: "ProjectMember", Id: 456};
+
+            unassign.withArgs(1, 2).resolves({});
+
+            create.withArgs({
+                User: {Id: 1},
+                Project: {Id: 2},
+                Role: {Id: 3}
+            }).resolves(response);
+
+            return expect(sut.assign(1, 2, 3))
+                .to.eventually.equal(response);
+        });
+    });
 });
