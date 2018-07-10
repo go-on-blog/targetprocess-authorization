@@ -1,5 +1,5 @@
 Usage:
-  npm run authorize-assign -u <user> -p <project> -r <role> -d <domain> -t <token>
+  authorize-assign -u <user> -p <project> -r <role> -d <domain> -t <token>
 
 Assigns a user to a project with the specified role.
 

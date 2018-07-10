@@ -1,5 +1,5 @@
 Usage:
-  npm run authorize-unassign -u <user> -p <project> -d <domain> -t <token>
+  authorize-unassign -u <user> -p <project> -d <domain> -t <token>
 
 Unassign a user from a project.
 

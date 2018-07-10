@@ -1,5 +1,5 @@
 Usage:
-  npm run authorize-show -u <user> -p <project> -d <domain> -t <token>
+  authorize-show -u <user> -p <project> -d <domain> -t <token>
 
 Show under which role a user is assigned to a project.
 
