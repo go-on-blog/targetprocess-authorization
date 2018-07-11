@@ -98,7 +98,8 @@ describe("projectMembers", function () {
                 uri: `https://${credentials.domain}/api/v1/ProjectMembers/`,
                 qs: {
                     token: credentials.token,
-                    where: `(User.Id eq ${id})and(Project.Id eq 2)`
+                    where: `(User.Id eq ${id})and(Project.Id eq 2)`,
+                    take: 1000
                 },
                 json: true
             };
@@ -140,7 +141,8 @@ describe("projectMembers", function () {
                 uri: `https://${credentials.domain}/api/v1/ProjectMembers/`,
                 qs: {
                     token: credentials.token,
-                    where: `(User.Id eq ${id})`
+                    where: `(User.Id eq ${id})`,
+                    take: 1000
                 },
                 json: true
             };
