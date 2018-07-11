@@ -34,7 +34,7 @@ function logger(result) {
 
 if (args.version) {
     console.log("v" + require("../package.json").version);
-} else if (args.help || process.argv.length < 5 || !args.domain || !args.token || !args.user) {
+} else if (args.help || process.argv.length < 5 || !args.domain || !args.token || (!args.user && !args.project)) {
     require("../lib/command/usage")(process.argv[1]).done(console.error);
 } else {
     require("../lib/adapter/authorize-unassign")(args).then(logger, console.error);

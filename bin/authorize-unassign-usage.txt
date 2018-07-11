@@ -13,6 +13,7 @@ Options:
   -p <project> --project=<name> Project you want to unassign the user from.
                                 If the project is missing, you'll unassign
                                 the user from all projects.
+                                Either project or user is required.
 
   -t --token=<value>            Authentication token.
                                 To get a security token, request the
@@ -20,6 +21,8 @@ Options:
                                 https://<domain>/api/v1/Authentication
 
   -u <name> --user=<name>       User you want to unassign. 
-                                This argument is required.
+                                If the user is missing, you'll unassign
+                                all users from the specified project.
+                                Either project or user is required.
 
   -v --version                  Show the version of this program.
