@@ -14,10 +14,28 @@ args = minimist(process.argv.slice(2), {
     }
 });
 
+function logger(result) {
+    function list(items) {
+        items.forEach(function (item) {
+            console.log(`- Id: ${item.Id}`);
+        });
+    }
+
+    if (result.Deleted && result.Deleted.Items && result.Deleted.Items.length > 0) {
+        console.log("Deleted items:");
+        list(result.Deleted.Items);
+    }
+
+    if (result.NotDeleted && result.NotDeleted.Items && result.NotDeleted.Items.length > 0) {
+        console.log("Items that were not deleted:");
+        list(result.NotDeleted.Items);
+    }
+}
+
 if (args.version) {
     console.log("v" + require("../package.json").version);
 } else if (args.help || process.argv.length < 5 || !args.domain || !args.token || !args.user) {
     require("../lib/command/usage")(process.argv[1]).done(console.error);
 } else {
-    require("../lib/adapter/authorize-unassign")(args).then(console.log, console.error);
+    require("../lib/adapter/authorize-unassign")(args).then(logger, console.error);
 }
