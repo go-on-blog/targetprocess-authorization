@@ -3,7 +3,7 @@
 */
 "use strict";
 
-const {describe, it} = require("mocha");
+const {after, before, describe, it} = require("mocha");
 
 describe("projectMembers", function () {
     const chai = require("chai");
@@ -27,6 +27,10 @@ describe("projectMembers", function () {
                 getId
             };
         }
+
+        before(function () {
+            sinon.spy(console, 'warn');
+        });
 
         it("should eventually return undefined when no argument is given", function () {
             const sut = factory(config);
@@ -57,6 +61,19 @@ describe("projectMembers", function () {
             return expect(sut.getId(stub, name))
                 .to.eventually.be.a("number")
                 .and.to.equal(42);
+        });
+
+        it("should output a warning when either user or project is not found by its name", function () {
+            const sut = factory(config);
+            const name = "x";
+            const stub = getStub(name, null);
+
+            return sut.getId(stub, name, true)
+                .then(() => expect(console.warn.calledOnce).to.be.true);
+        });
+
+        after(function () {
+            console.warn.restore();
         });
     });
 
@@ -168,6 +185,20 @@ describe("projectMembers", function () {
             return expect(sut.getItems(name))
                 .to.eventually.be.an("array")
                 .and.to.deep.equal(expected.Items);
+        });
+
+        it("should throw an error when both project and user names are not valid", function () {
+            const badUserName = "x";
+            const badProjectName = "y";
+            const users = {};
+            const projects = {};
+            const sut = getSUT(users, projects);
+            const getId = sinon.stub(sut, "getId");
+            getId.withArgs(users, badUserName).resolves(null);
+            getId.withArgs(projects, badProjectName).resolves(null);
+
+            return expect(sut.getItems(badUserName, badProjectName))
+                .to.be.rejectedWith(Error);
         });
     });
 

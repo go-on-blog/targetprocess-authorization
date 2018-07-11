@@ -22,9 +22,9 @@ describe("authorize-unassign CLI", function () {
         });
     });
 
-    describe("(without user)", function () {
+    describe("(without user nor project)", function () {
         it("should print usage on stderr", function (done) {
-            execFile("node", [script, "--domain", "--project", "--token"], function (error, stdout, stderr) {
+            execFile("node", [script, "--domain", "--token"], function (error, stdout, stderr) {
                 assert.ifError(error);
                 assert.isEmpty(stdout);
                 assert.isNotEmpty(stderr);
