@@ -26,8 +26,7 @@
   "dependencies": {
     "@stamp/it": "^1.0.3",
     "minimist": "^1.2.0",
-    "targetprocess-api": "^0.2.1",
-    "when": "^3.7.8"
+    "targetprocess-api": ">=0.3.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -35,8 +34,8 @@
     "codecov": "latest",
     "istanbul": "latest",
     "jslint": "latest",
-    "mocha": "^5.0.5",
-    "sinon": "^4.4.8"
+    "mocha": "^5.2.0",
+    "sinon": "^4.5.0"
   },
   "engines": {
     "node": ">=6.0.0"
