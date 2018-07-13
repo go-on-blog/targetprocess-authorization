@@ -262,14 +262,9 @@ describe("projectMembers", function () {
     });
 
     describe("assign", function () {
-        it("should return a rejected promise if the user is undefined", function () {
+        it("should return a rejected promise when both project and user name are not valid", function () {
             const sut = factory(config);
             return expect(sut.assign(undefined, "Project", "Role")).to.be.rejected;
-        });
-
-        it("should return a rejected promise if the project is undefined", function () {
-            const sut = factory(config);
-            return expect(sut.assign("User", undefined, "Role")).to.be.rejected;
         });
 
         it("should unassign prior assignment", function () {
@@ -307,5 +302,23 @@ describe("projectMembers", function () {
             return expect(sut.assign(1, 2, 3))
                 .to.eventually.equal(response);
         });
+
+        // it("shold assign the project to all users when no user is specified", function () {
+        //     const user = undefined;
+        //     const batchCreate = sinon.stub();
+        //     const creator = {batchCreate};
+        //     const stampit = require("@stamp/it");
+        //     const stamp = stampit(factory, {props: {creator}});
+        //     const sut = stamp(config);
+        //     const unassign = sinon.stub(sut, "unassign");
+        //     const response = {ResourceType: "ProjectMember", Id: 456};
+
+        //     unassign.withArgs(user, 1).resolves({});
+        //     batchCreate.resolves([]);
+
+        //     sut.assign(user, 2, 3);
+        //     return expect(batchCreate.calledWith());
+
+        // });
     });
 });

@@ -22,20 +22,9 @@ describe("authorize-assign CLI", function () {
         });
     });
 
-    describe("(without user)", function () {
+    describe("(without user nor project)", function () {
         it("should print usage on stderr", function (done) {
-            execFile("node", [script, "--domain", "--project", "--token"], function (error, stdout, stderr) {
-                assert.ifError(error);
-                assert.isEmpty(stdout);
-                assert.isNotEmpty(stderr);
-                done();
-            });
-        });
-    });
-
-    describe("(without project)", function () {
-        it("should print usage on stderr", function (done) {
-            execFile("node", [script, "--domain", "--token", "--user"], function (error, stdout, stderr) {
+            execFile("node", [script, "--domain", "--token", "--role"], function (error, stdout, stderr) {
                 assert.ifError(error);
                 assert.isEmpty(stdout);
                 assert.isNotEmpty(stderr);
