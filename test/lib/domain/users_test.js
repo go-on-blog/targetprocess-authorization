@@ -48,7 +48,7 @@ describe("users", function () {
     });
 
     describe("getAll", function () {
-        it("should return the user id matching the specified last name", function () {
+        it("should return an array of all users", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Users/`,
@@ -59,10 +59,10 @@ describe("users", function () {
                 },
                 json: true
             };
-            const expected = [{Id: 42}];
+            const expected = [{Id: 1}, {Id: 2}, {Id: 3}];
             const sut = getSUT(args, {Items: expected});
 
-            return expect(sut.getAll(["Id"]))
+            return expect(sut.getAll())
                 .to.eventually.be.an("array")
                 .and.to.have.deep.members(expected);
         });
