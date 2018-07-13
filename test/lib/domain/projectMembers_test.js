@@ -264,6 +264,10 @@ describe("projectMembers", function () {
     describe("assign", function () {
         it("should return a rejected promise when both project and user name are not valid", function () {
             const sut = factory(config);
+            const getId = sinon.stub(sut, "getId");
+
+            getId.resolves(undefined);
+
             return expect(sut.assign(undefined, "Project", "Role")).to.be.rejected;
         });
 
@@ -303,22 +307,30 @@ describe("projectMembers", function () {
                 .to.eventually.equal(response);
         });
 
-        // it("shold assign the project to all users when no user is specified", function () {
-        //     const user = undefined;
-        //     const batchCreate = sinon.stub();
-        //     const creator = {batchCreate};
-        //     const stampit = require("@stamp/it");
-        //     const stamp = stampit(factory, {props: {creator}});
-        //     const sut = stamp(config);
-        //     const unassign = sinon.stub(sut, "unassign");
-        //     const response = {ResourceType: "ProjectMember", Id: 456};
+        it("shold assign the project to all users when no user is specified", function () {
+            const user = undefined;
+            const project = 1;
+            const role = 2;
+            const batchCreate = sinon.stub();
+            const creator = {batchCreate};
+            const getAll = sinon.stub();
+            const users = {getAll};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {creator, users}});
+            const sut = stamp(config);
+            const unassign = sinon.stub(sut, "unassign");
+            const batch = [
+                {User: {Id: 10}, Project: {Id: project}, Role: {Id: role}},
+                {User: {Id: 11}, Project: {Id: project}, Role: {Id: role}},
+                {User: {Id: 12}, Project: {Id: project}, Role: {Id: role}}
+            ];
 
-        //     unassign.withArgs(user, 1).resolves({});
-        //     batchCreate.resolves([]);
+            unassign.withArgs(user, project).resolves({});
+            getAll.resolves([]);
+            batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
 
-        //     sut.assign(user, 2, 3);
-        //     return expect(batchCreate.calledWith());
-
-        // });
+            sut.assign(user, project, role);
+            return expect(batchCreate.calledWith(batch));
+        });
     });
 });

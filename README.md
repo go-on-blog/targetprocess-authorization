@@ -35,3 +35,38 @@ You should then run any of the tools provided like this:
 ```
 $ authorization-show ...
 ```
+
+### Command Line Tools
+
+* authorization-show: Show under which role a user is assigned to a project.
+* authorization-assign: Assign a user to a project with the specified role.
+* authorization-unassign: Unassign a user from a project.
+
+If you want more details about one of these tools, use the `help` option. For instance:
+
+```bash
+$ authorization-show --help
+```
+
+### How To
+
+* Show under which role a user is assigned to a project, knowing their ids.
+  ```bash
+  $ authorization-show -d mycompany.tpondemand.com -t <token> -p 123 -u 456
+  ```
+
+* Show under which role a user is assigned to a project.  
+  You may use the name instead of the id (last name for users).
+  ```bash
+  $ authorization-show -d mycompany.tpondemand.com -t <token> -p "Indiana Jones" -u Spielberg
+  ```
+
+* Show the list of all users assigned to one particular project
+  ```bash
+  $ authorization-show -d mycompany.tpondemand.com -t <token> -p MyProject
+  ```
+
+* Assign all users to one particular project with the specified role
+  ```bash
+  $ authorization-assign -d mycompany.tpondemand.com -t <token> -p MyProject -r Developer
+  ```

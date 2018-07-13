@@ -1,7 +1,7 @@
 Usage:
   authorize-assign -u <user> -p <project> -r <role> -d <domain> -t <token>
 
-Assigns a user to a project with the specified role.
+Assign a user to a project with the specified role.
 
 Options:
 
