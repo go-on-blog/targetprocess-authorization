@@ -272,6 +272,11 @@ describe("projectMembers", function () {
 
             return expect(sut.makeItem(1, 2, 3)).to.deep.equal(expected);
         });
+
+        it("should return an object without Role property when the role is undefined", function () {
+            const sut = factory(config);
+            return expect(sut.makeItem(1, 2)).to.not.have.own.property("Role");
+        });
     });
 
     describe("assign", function () {
