@@ -261,6 +261,19 @@ describe("projectMembers", function () {
         });
     });
 
+    describe("makeItem", function () {
+        it("should return an object with User, Project and Role properties when passed to the function", function () {
+            const sut = factory(config);
+            const expected = {
+                User: {Id: 1},
+                Project: {Id: 2},
+                Role: {Id: 3}
+            };
+
+            return expect(sut.makeItem(1, 2, 3)).to.deep.equal(expected);
+        });
+    });
+
     describe("assign", function () {
         it("should return a rejected promise when both project and user name are not valid", function () {
             const sut = factory(config);
