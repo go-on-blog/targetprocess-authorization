@@ -304,8 +304,8 @@ describe("projectMembers", function () {
             const role = 3;
             const batchCreate = sinon.stub();
             const creator = {batchCreate};
-            const getAll = sinon.stub();
-            const users = {getAll};
+            const getActive = sinon.stub();
+            const users = {getActive};
             const stampit = require("@stamp/it");
             const stamp = stampit(factory, {props: {creator, users}});
             const sut = stamp(config);
@@ -315,7 +315,7 @@ describe("projectMembers", function () {
                 {User: {Id: 12}, Project: {Id: project}, Role: {Id: role}}
             ];
 
-            getAll.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
+            getActive.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
             batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
 
             sut.create(user, project, role);
@@ -328,8 +328,8 @@ describe("projectMembers", function () {
             const role = 3;
             const batchCreate = sinon.stub();
             const creator = {batchCreate};
-            const getAll = sinon.stub();
-            const projects = {getAll};
+            const getActive = sinon.stub();
+            const projects = {getActive};
             const stampit = require("@stamp/it");
             const stamp = stampit(factory, {props: {creator, projects}});
             const sut = stamp(config);
@@ -339,7 +339,7 @@ describe("projectMembers", function () {
                 {User: {Id: user}, Project: {Id: 12}, Role: {Id: role}}
             ];
 
-            getAll.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
+            getActive.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
             batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
 
             sut.create(user, project, role);

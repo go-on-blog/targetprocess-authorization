@@ -5,18 +5,18 @@
 
 const {describe, it} = require("mocha");
 
-describe("getAll", function () {
+describe("getActive", function () {
     const chai = require("chai");
     const expect = chai.expect;
     const chaiAsPromised = require("chai-as-promised");
     const sinon = require("sinon");
-    const factory = require("../../../lib/domain/getAll");
+    const factory = require("../../../lib/domain/getActive");
     const credentials = require("../../credentials");
     const config = Object.assign({resource: "Users"}, credentials);
 
     chai.use(chaiAsPromised);
 
-    describe("getAll", function () {
+    describe("getActive", function () {
         function getSUT(args, value) {
             const request = sinon.stub();
             const retriever = require("targetprocess-api/retrieve")(Object.assign({request}, config));
@@ -35,6 +35,7 @@ describe("getAll", function () {
                 uri: `https://${credentials.domain}/api/v1/Users/`,
                 qs: {
                     token: credentials.token,
+                    where: "(IsActive eq 'true')",
                     include: "[Id]",
                     take: 1000
                 },
@@ -42,7 +43,7 @@ describe("getAll", function () {
             };
             const sut = getSUT(args, {Items: []});
 
-            return expect(sut.getAll())
+            return expect(sut.getActive())
                 .to.eventually.be.an("array")
                 .and.to.be.empty;
         });
@@ -53,6 +54,7 @@ describe("getAll", function () {
                 uri: `https://${credentials.domain}/api/v1/Users/`,
                 qs: {
                     token: credentials.token,
+                    where: "(IsActive eq 'true')",
                     include: "[Id]",
                     take: 1000
                 },
@@ -61,7 +63,7 @@ describe("getAll", function () {
             const expected = [{Id: 42}];
             const sut = getSUT(args, {Items: expected});
 
-            return expect(sut.getAll())
+            return expect(sut.getActive())
                 .to.eventually.be.an("array")
                 .and.to.have.lengthOf(1)
                 .and.to.have.deep.members(expected);
@@ -73,6 +75,7 @@ describe("getAll", function () {
                 uri: `https://${credentials.domain}/api/v1/Users/`,
                 qs: {
                     token: credentials.token,
+                    where: "(IsActive eq 'true')",
                     include: "[Id,Login]",
                     take: 1000
                 },
@@ -81,7 +84,7 @@ describe("getAll", function () {
             const expected = [{Id: 42, Login: "Deep Thought"}];
             const sut = getSUT(args, {Items: expected});
 
-            return expect(sut.getAll(["Id", "Login"]))
+            return expect(sut.getActive(["Id", "Login"]))
                 .to.eventually.be.an("array")
                 .and.to.have.deep.members(expected);
         });

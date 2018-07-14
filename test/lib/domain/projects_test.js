@@ -47,13 +47,14 @@ describe("projects", function () {
         });
     });
 
-    describe("getAll", function () {
+    describe("getActive", function () {
         it("should return an array of all projects", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Projects/`,
                 qs: {
                     token: credentials.token,
+                    where: "(IsActive eq 'true')",
                     include: "[Id]",
                     take: 1000
                 },
@@ -62,7 +63,7 @@ describe("projects", function () {
             const expected = [{Id: 1}, {Id: 2}, {Id: 3}];
             const sut = getSUT(args, {Items: expected});
 
-            return expect(sut.getAll())
+            return expect(sut.getActive())
                 .to.eventually.be.an("array")
                 .and.to.have.deep.members(expected);
         });
