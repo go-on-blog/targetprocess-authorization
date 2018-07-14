@@ -279,6 +279,74 @@ describe("projectMembers", function () {
         });
     });
 
+    describe("create", function () {
+        it("should assign the given user to the given project", function () {
+            const create = sinon.stub();
+            const creator = {create};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {creator}});
+            const sut = stamp(config);
+            const response = {ResourceType: "ProjectMember", Id: 456};
+
+            create.withArgs({
+                User: {Id: 1},
+                Project: {Id: 2},
+                Role: {Id: 3}
+            }).resolves(response);
+
+            return expect(sut.create(1, 2, 3))
+                .to.eventually.equal(response);
+        });
+
+        it("shold assign the project to all users when no user is specified", function () {
+            const user = undefined;
+            const project = 2;
+            const role = 3;
+            const batchCreate = sinon.stub();
+            const creator = {batchCreate};
+            const getAll = sinon.stub();
+            const users = {getAll};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {creator, users}});
+            const sut = stamp(config);
+            const batch = [
+                {User: {Id: 10}, Project: {Id: project}, Role: {Id: role}},
+                {User: {Id: 11}, Project: {Id: project}, Role: {Id: role}},
+                {User: {Id: 12}, Project: {Id: project}, Role: {Id: role}}
+            ];
+
+            getAll.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
+            batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
+
+            sut.create(user, project, role);
+            return expect(batchCreate.calledWith(batch));
+        });
+
+        it("shold assign a user to all projects when no project is specified", function () {
+            const user = 1;
+            const project = undefined;
+            const role = 3;
+            const batchCreate = sinon.stub();
+            const creator = {batchCreate};
+            const getAll = sinon.stub();
+            const projects = {getAll};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {creator, projects}});
+            const sut = stamp(config);
+            const batch = [
+                {User: {Id: user}, Project: {Id: 10}, Role: {Id: role}},
+                {User: {Id: user}, Project: {Id: 11}, Role: {Id: role}},
+                {User: {Id: user}, Project: {Id: 12}, Role: {Id: role}}
+            ];
+
+            getAll.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
+            batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
+
+            sut.create(user, project, role);
+            return expect(batchCreate.calledWith(batch));
+        });
+    });
+
     describe("assign", function () {
         it("should return a rejected promise when both project and user name are not valid", function () {
             const sut = factory(config);
@@ -289,66 +357,16 @@ describe("projectMembers", function () {
             return expect(sut.assign(undefined, "Project", "Role")).to.be.rejected;
         });
 
-        it("should unassign prior assignment", function () {
-            const create = sinon.stub();
-            const creator = {create};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {creator}});
-            const sut = stamp(config);
+        it("should remove prior assignments and create new ones", function () {
+            const sut = factory(config);
             const unassign = sinon.stub(sut, "unassign");
+            const create = sinon.stub(sut, "create");
 
             unassign.withArgs(1, 2).resolves({});
             create.resolves({});
 
             sut.assign(1, 2, 3);
-            return expect(unassign.calledWith(1, 2));
-        });
-
-        it("should eventually assign the given user to the given project", function () {
-            const create = sinon.stub();
-            const creator = {create};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {creator}});
-            const sut = stamp(config);
-            const unassign = sinon.stub(sut, "unassign");
-            const response = {ResourceType: "ProjectMember", Id: 456};
-
-            unassign.withArgs(1, 2).resolves({});
-
-            create.withArgs({
-                User: {Id: 1},
-                Project: {Id: 2},
-                Role: {Id: 3}
-            }).resolves(response);
-
-            return expect(sut.assign(1, 2, 3))
-                .to.eventually.equal(response);
-        });
-
-        it("shold assign the project to all users when no user is specified", function () {
-            const user = undefined;
-            const project = 1;
-            const role = 2;
-            const batchCreate = sinon.stub();
-            const creator = {batchCreate};
-            const getAll = sinon.stub();
-            const users = {getAll};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {creator, users}});
-            const sut = stamp(config);
-            const unassign = sinon.stub(sut, "unassign");
-            const batch = [
-                {User: {Id: 10}, Project: {Id: project}, Role: {Id: role}},
-                {User: {Id: 11}, Project: {Id: project}, Role: {Id: role}},
-                {User: {Id: 12}, Project: {Id: project}, Role: {Id: role}}
-            ];
-
-            unassign.withArgs(user, project).resolves({});
-            getAll.resolves([]);
-            batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
-
-            sut.assign(user, project, role);
-            return expect(batchCreate.calledWith(batch));
+            return expect(unassign.calledWith(1, 2) && create.calledWith(1, 2, 3));
         });
     });
 });
