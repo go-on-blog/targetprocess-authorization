@@ -29,7 +29,7 @@ describe("projectMembers", function () {
         }
 
         before(function () {
-            sinon.spy(console, 'warn');
+            sinon.stub(console, 'warn');
         });
 
         it("should eventually return undefined when no argument is given", function () {
@@ -208,9 +208,7 @@ describe("projectMembers", function () {
         it("should return a string matching given user and project", function () {
             const userName = "Bourne";
             const projectName = "Treadstone";
-            const sut = factory(config);
-            const getItems = sinon.stub(sut, "getItems");
-            getItems.withArgs(userName, projectName).resolves([
+            const items = [
                 {
                     User: {
                         Id: 1,
@@ -225,11 +223,14 @@ describe("projectMembers", function () {
                         Name: "Developer"
                     }
                 }
-            ]);
+            ];
+            const sut = factory(config);
+            const getItems = sinon.stub(sut, "getItems");
+            getItems.withArgs(userName, projectName).resolves(items);
 
             return expect(sut.show(userName, projectName))
-                .to.eventually.be.a("string")
-                .and.to.equal("Jason Bourne is assigned to Treadstone with the Developer role.\n");
+                .to.eventually.be.an("array")
+                .and.to.deep.equal(items);
         });
     });
 

@@ -14,10 +14,20 @@ args = minimist(process.argv.slice(2), {
     }
 });
 
+function format(data) {
+    return data.reduce(function (accumulator, item) {
+        return accumulator.concat(`- ${item.User.FirstName} ${item.User.LastName} is assigned to ${item.Project.Name} with the ${item.Role.Name} role\n`);
+    }, "");
+}
+
+function log(result) {
+    console.log(`Current assignments:\n${format(result)}`);
+}
+
 if (args.version) {
     console.log("v" + require("../package.json").version);
 } else if (args.help || process.argv.length < 5 || !args.domain || !args.token || (!args.user && !args.project)) {
     require("../lib/command/usage")(process.argv[1]).then(console.error);
 } else {
-    require("../lib/adapter/authorize-show")(args).then(console.log, console.error);
+    require("../lib/adapter/authorize-show")(args).then(log, console.error);
 }
