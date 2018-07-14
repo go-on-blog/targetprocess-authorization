@@ -66,17 +66,20 @@ $ authorization-show --help
   $ authorization-show -d mycompany.tpondemand.com -t <token> -p "Indiana Jones"
   ```
 
-* Assign all users to one particular project with the specified role
+* Assign all active users to one particular project with the specified role.  
+  (If you don't specify the user, the project is assigned to all active users.)
   ```bash
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "Indiana Jones" -r actor
   ```
 
-* Assign all users to one particular project with their default role
+* Assign all active users to one particular project with their default role.  
+  (If you don't specify the role, the default role of the user is used.)
   ```bash
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "Indiana Jones"
   ```
 
-* Assign a user to all projects with the specified role
+* Assign a user to all active projects with the specified role.  
+  (If you don't specify the project, the user is assigned to all active projects.)
   ```bash
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -u Spielberg -r director
   ```
