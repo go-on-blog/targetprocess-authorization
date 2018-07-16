@@ -84,8 +84,19 @@ $ authorization-show --help
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -u Spielberg -r director
   ```
 
-* Assign all users to the projects matching given criteria with the specified role.
+* Assign all users to the projects matching given filtering conditions with the specified role. See [Filters](#filters) for more details on filtering conditions.
   ```bash
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "where=(IsProduct eq 'true')" -r developer
   ```
 
+### Filters <a name="filers"></a>
+
+Filtering conditions must be specified using [Targetprocess API syntax](https://dev.targetprocess.com/docs/sorting-and-filters).
+
+Quick summary:
+
+* The operator 'and' is case-sensitive, so it has to be in lower case (e.g. 'AND' or 'And' will not work).
+* In order to combine several rules you have to use logical grouping with brackets (ie "(" and ")").
+* The operator 'or' is not supported.
+* Use single quotes to enclose non-numeric values.
+* Escaping of single quote symbol in values can be done using preceding backslash: `where=Name contains '\''`
