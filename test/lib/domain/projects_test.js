@@ -27,8 +27,8 @@ describe("projects", function () {
         return stamp();
     }
 
-    describe("getId", function () {
-        it("should return the project id matching the specified name", function () {
+    describe("getByName", function () {
+        it("should eventually return the project id matching the specified name", function () {
             const name = "x";
             const args = {
                 method: "GET",
@@ -41,14 +41,14 @@ describe("projects", function () {
             };
             const sut = getSUT(args, {Items: [{Id: 42}]});
 
-            return expect(sut.getId(name))
+            return expect(sut.getByName(name))
                 .to.eventually.be.a("number")
                 .and.to.equal(42);
         });
     });
 
     describe("getActive", function () {
-        it("should return an array of all projects", function () {
+        it("should eventually return an array of all active projects", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Projects/`,

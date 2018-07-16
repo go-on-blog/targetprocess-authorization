@@ -29,7 +29,7 @@ describe("getActive", function () {
             return stamp();
         }
 
-        it("should return an empty array when no item is found", function () {
+        it("should eventually return an empty array when no item is found", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Users/`,
@@ -48,7 +48,7 @@ describe("getActive", function () {
                 .and.to.be.empty;
         });
 
-        it("should return an array of objects when items are found", function () {
+        it("should eventually return an array of objects when items are found", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Users/`,
@@ -69,7 +69,7 @@ describe("getActive", function () {
                 .and.to.have.deep.members(expected);
         });
 
-        it("should return an array of objects including the specified properties", function () {
+        it("should eventually return an array of objects including the specified properties", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Users/`,

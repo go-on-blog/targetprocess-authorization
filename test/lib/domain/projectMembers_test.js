@@ -18,13 +18,13 @@ describe("projectMembers", function () {
 
     describe("getId", function () {
         function getStub(args, value) {
-            const getId = sinon.stub();
+            const getByName = sinon.stub();
 
-            getId.withArgs(args).resolves(value);
+            getByName.withArgs(args).resolves(value);
 
             return {
                 resource: "Users",
-                getId
+                getByName
             };
         }
 
@@ -63,7 +63,7 @@ describe("projectMembers", function () {
                 .and.to.equal(42);
         });
 
-        it("should output a warning when either user or project is not found by its name", function () {
+        it("should eventually output a warning when either user or project is not found by its name", function () {
             const sut = factory(config);
             const name = "x";
             const stub = getStub(name, null);
@@ -90,7 +90,7 @@ describe("projectMembers", function () {
             return stamp(config);
         }
 
-        it("should return an array with a single item matching given user name and project id", function () {
+        it("should eventually return an array with a single item matching given user name and project id", function () {
             const name = "Bourne";
             const id = 1;
             const args = {
@@ -133,7 +133,7 @@ describe("projectMembers", function () {
                 .and.to.deep.equal(expected.Items);
         });
 
-        it("should return an array with several items matching the given user name", function () {
+        it("should eventually return an array with several items matching the given user name", function () {
             const name = "Bourne";
             const id = 1;
             const args = {
@@ -189,7 +189,7 @@ describe("projectMembers", function () {
                 .and.to.deep.equal(expected.Items);
         });
 
-        it("should throw an error when both project and user names are not valid", function () {
+        it("should return a rejected promise when both project and user names are not valid", function () {
             const badUserName = "x";
             const badProjectName = "y";
             const users = {};
@@ -205,7 +205,7 @@ describe("projectMembers", function () {
     });
 
     describe("show", function () {
-        it("should return a string matching given user and project", function () {
+        it("should eventually return a string matching given user and project", function () {
             const userName = "Bourne";
             const projectName = "Treadstone";
             const items = [
@@ -235,7 +235,7 @@ describe("projectMembers", function () {
     });
 
     describe("unassign", function () {
-        it("should return a fulfilled promise once the given user has been unassigned from the given project", function () {
+        it("should eventually return a single object when a single user/project couple is given", function () {
             const userName = "Bourne";
             const projectName = "Treadstone";
             const batchRemove = sinon.stub();
@@ -260,10 +260,44 @@ describe("projectMembers", function () {
             return expect(sut.unassign(userName, projectName))
                 .to.eventually.equal(response);
         });
+
+        it("should eventually return a compound object when a user/project set is given", function () {
+            const userName = "Bourne";
+            const batchRemove = sinon.stub();
+            const remover = {batchRemove};
+            const stampit = require("@stamp/it");
+            const stamp = stampit(factory, {props: {remover}});
+            const sut = stamp(config);
+            const getItems = sinon.stub(sut, "getItems");
+            const response = {
+                Deleted: {Items: []},
+                NotDelete: {Items: []}
+            };
+
+            getItems.withArgs(userName).resolves([
+                {
+                    Id: 42,
+                    User: {Id: 10},
+                    Project: {Id: 20},
+                    Role: {Id: 30}
+                },
+                {
+                    Id: 43,
+                    User: {Id: 10},
+                    Project: {Id: 21},
+                    Role: {Id: 30}
+                }
+            ]);
+
+            batchRemove.withArgs([42, 43]).resolves(response);
+
+            return expect(sut.unassign(userName))
+                .to.eventually.deep.equal(response);
+        });
     });
 
     describe("makeItem", function () {
-        it("should return an object with User, Project and Role properties when passed to the function", function () {
+        it("should return an object with User, Project and Role properties set according to arguments", function () {
             const sut = factory(config);
             const expected = {
                 User: {Id: 1},
@@ -281,7 +315,7 @@ describe("projectMembers", function () {
     });
 
     describe("create", function () {
-        it("should assign the given user to the given project", function () {
+        it("should eventually assign the given user to the given project", function () {
             const create = sinon.stub();
             const creator = {create};
             const stampit = require("@stamp/it");
@@ -299,7 +333,7 @@ describe("projectMembers", function () {
                 .to.eventually.equal(response);
         });
 
-        it("shold assign the project to all users when no user is specified", function () {
+        it("shold eventually assign the project to all users when no user is specified", function () {
             const user = undefined;
             const project = 2;
             const role = 3;
@@ -323,7 +357,7 @@ describe("projectMembers", function () {
             return expect(batchCreate.calledWith(batch));
         });
 
-        it("shold assign a user to all projects when no project is specified", function () {
+        it("shold eventually assign a user to all projects when no project is specified", function () {
             const user = 1;
             const project = undefined;
             const role = 3;
@@ -358,7 +392,7 @@ describe("projectMembers", function () {
             return expect(sut.assign(undefined, "Project", "Role")).to.be.rejected;
         });
 
-        it("should remove prior assignments and create new ones", function () {
+        it("should eventually remove prior assignments and create new ones", function () {
             const sut = factory(config);
             const unassign = sinon.stub(sut, "unassign");
             const create = sinon.stub(sut, "create");

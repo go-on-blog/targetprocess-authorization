@@ -27,8 +27,8 @@ describe("users", function () {
         return stamp();
     }
 
-    describe("getId", function () {
-        it("should return the user id matching the specified last name", function () {
+    describe("getByName", function () {
+        it("should eventually return the user id matching the specified last name", function () {
             const lastName = "x";
             const args = {
                 method: "GET",
@@ -41,14 +41,14 @@ describe("users", function () {
             };
             const sut = getSUT(args, {Items: [{Id: 42}]});
 
-            return expect(sut.getId(lastName))
+            return expect(sut.getByName(lastName))
                 .to.eventually.be.a("number")
                 .and.to.equal(42);
         });
     });
 
     describe("getActive", function () {
-        it("should return an array of all users", function () {
+        it("should eventually return an array of all active users", function () {
             const args = {
                 method: "GET",
                 uri: `https://${credentials.domain}/api/v1/Users/`,

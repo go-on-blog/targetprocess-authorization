@@ -15,7 +15,7 @@ describe("roles", function () {
 
     chai.use(chaiAsPromised);
 
-    describe("getId", function () {
+    describe("getByName", function () {
         function getSUT(args, value) {
             const request = sinon.stub();
             const retriever = require("targetprocess-api/retrieve")(Object.assign({request, resource: "Roles"}, credentials));
@@ -28,7 +28,7 @@ describe("roles", function () {
             return stamp();
         }
 
-        it("should return the role id matching the specified name", function () {
+        it("should eventually return the role id matching the specified name", function () {
             const name = "Developer";
             const args = {
                 method: "GET",
@@ -41,7 +41,7 @@ describe("roles", function () {
             };
             const sut = getSUT(args, {Items: [{Id: 42}]});
 
-            return expect(sut.getId(name))
+            return expect(sut.getByName(name))
                 .to.eventually.be.a("number")
                 .and.to.equal(42);
         });
