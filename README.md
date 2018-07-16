@@ -83,3 +83,9 @@ $ authorization-show --help
   ```bash
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -u Spielberg -r director
   ```
+
+* Assign all users to the projects matching given criteria with the specified role.
+  ```bash
+  $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "where=(IsProduct eq 'true')" -r developer
+  ```
+
