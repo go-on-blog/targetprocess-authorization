@@ -89,7 +89,7 @@ $ authorization-show --help
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "where=(IsProduct eq 'true')" -r developer
   ```
 
-### Filters <a name="filers"></a>
+### Filters
 
 Filtering conditions must be specified using [Targetprocess API syntax](https://dev.targetprocess.com/docs/sorting-and-filters).
 

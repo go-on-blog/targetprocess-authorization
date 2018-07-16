@@ -77,6 +77,95 @@ describe("projectMembers", function () {
         });
     });
 
+    describe("toIds", function () {
+        function getHandlerWithFakeFunction(args, value, prop) {
+            const stub = sinon.stub();
+            const handler = {resource: "Users"};
+
+            stub.rejects();
+            stub.withArgs(args).resolves(value);
+            handler[prop] = stub;
+
+            return handler;
+        }
+
+        it("should eventually return undefined when criteria is omitted", function () {
+            const sut = factory(config);
+            return expect(sut.toIds(null, undefined)).to.eventually.be.undefined;
+        });
+
+        it("should eventually return undefined when criteria is null", function () {
+            const sut = factory(config);
+            return expect(sut.toIds(null, null)).to.eventually.be.undefined;
+        });
+
+        it("should eventually return undefined when criteria is a boolean (false)", function () {
+            const sut = factory(config);
+            return expect(sut.toIds(null, false)).to.eventually.be.undefined;
+        });
+
+        it("should eventually return undefined when criteria is a boolean (true)", function () {
+            const sut = factory(config);
+            return expect(sut.toIds(null, true)).to.eventually.be.undefined;
+        });
+
+        it("should eventually return a one-item array when criteria is a number", function () {
+            const sut = factory(config);
+            const id = 1;
+
+            return expect(sut.toIds(null, id)).to.eventually.be.an("array").and.to.deep.equal([id]);
+        });
+
+        it("should convert criteria to string when it is neither undefined, null, boolean nor integer", function () {
+            const sut = factory(config);
+            const name = "ABC";
+            const handler = getHandlerWithFakeFunction(name, 42, "getByName");
+
+            return expect(sut.toIds(handler, [name]))
+                .to.eventually.be.an("array")
+                .and.to.deep.equal([42]);
+        });
+
+        it("should eventually invoke the filter function when criteria is a string starting with 'where='", function () {
+            const sut = factory(config);
+            const condition = "(FirstName eq 'Adam')";
+            const expected = 42;
+            const handler = getHandlerWithFakeFunction(condition, expected, "filter");
+
+            return expect(sut.toIds(handler, `where=${condition}`))
+                .to.eventually.equal(expected);
+        });
+
+        it("should eventually be rejected when no item of the given name is found", function () {
+            const sut = factory(config);
+            const name = "x";
+            const handler = getHandlerWithFakeFunction(name, null, "getByName");
+
+            return expect(sut.toIds(handler, name))
+                .to.be.rejected;
+        });
+
+        it("should eventually be rejected when the given name matches several items", function () {
+            const sut = factory(config);
+            const veryCommonLastName = "Smith";
+            const handler = getHandlerWithFakeFunction(veryCommonLastName, [1, 2], "getByName");
+
+            return expect(sut.toIds(handler, veryCommonLastName))
+                .to.be.rejected;
+        });
+
+        it("should eventually return an array whose unique item is matching the given name", function () {
+            const sut = factory(config);
+            const name = "x";
+            const expected = 42;
+            const handler = getHandlerWithFakeFunction(name, expected, "getByName");
+
+            return expect(sut.toIds(handler, name))
+                .to.eventually.be.an("array")
+                .and.to.deep.equal([expected]);
+        });
+    });
+
     describe("getItems", function () {
         function getSUT(users, projects, args, value) {
             const request = sinon.stub();
