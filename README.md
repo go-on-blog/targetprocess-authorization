@@ -50,21 +50,27 @@ $ authorization-show --help
 
 ### How To
 
-* Show under which role a user is assigned to a project, knowing their ids.
+**Show**
+
+* Show under which role a user is assigned to a project, knowing user and project id.
   ```bash
-  $ authorization-show -d mycompany.tpondemand.com -t <token> -p 123 -u 456
+  $ authorization-show -d mycompany.tpondemand.com -t <token> -u 123 -p 456
   ```
 
-* Show under which role a user is assigned to a project.  
+* Show under which role a user is assigned to a project, without knowing any id.  
   You may use the name instead of the id (last name for users).
   ```bash
-  $ authorization-show -d mycompany.tpondemand.com -t <token> -p "Indiana Jones" -u Spielberg
+  $ authorization-show -d mycompany.tpondemand.com -t <token> -u Spielberg -p "Indiana Jones"
   ```
 
 * Show the list of all users assigned to one particular project
   ```bash
   $ authorization-show -d mycompany.tpondemand.com -t <token> -p "Indiana Jones"
   ```
+
+**Unassign**
+
+**Assign**
 
 * Assign all active users to one particular project with the specified role.  
   (If you don't specify the user, the project is assigned to all active users.)

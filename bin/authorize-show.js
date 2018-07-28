@@ -20,8 +20,8 @@ function format(data) {
     }, "");
 }
 
-function log(result) {
-    console.log(`Current assignments:\n${format(result)}`);
+function log([users, projects, items]) {
+    console.log(`Current assignments:\n${format(items)}`);
 }
 
 if (args.version) {

@@ -20,7 +20,7 @@ function format(data) {
     }, "");
 }
 
-function log(result) {
+function log([users, projects, assignments, result]) {
     if (result.Deleted && result.Deleted.Items && result.Deleted.Items.length > 0) {
         console.log(`Unassigned items:\n${format(result.Deleted.Items)}`);
     }

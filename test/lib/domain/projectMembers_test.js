@@ -3,7 +3,7 @@
 */
 "use strict";
 
-const {after, before, describe, it} = require("mocha");
+const {describe, it} = require("mocha");
 
 describe("projectMembers", function () {
     const chai = require("chai");
@@ -15,67 +15,6 @@ describe("projectMembers", function () {
     const config = Object.assign({resource: "ProjectMembers"}, credentials);
 
     chai.use(chaiAsPromised);
-
-    describe("getId", function () {
-        function getStub(args, value) {
-            const getByName = sinon.stub();
-
-            getByName.withArgs(args).resolves(value);
-
-            return {
-                resource: "Users",
-                getByName
-            };
-        }
-
-        before(function () {
-            sinon.stub(console, 'warn');
-        });
-
-        it("should eventually return undefined when no argument is given", function () {
-            const sut = factory(config);
-            return expect(sut.getId(null, undefined)).to.eventually.be.undefined;
-        });
-
-        it("should eventually return its argument when it is a number", function () {
-            const sut = factory(config);
-            const id = 1;
-
-            return expect(sut.getId(null, id)).to.eventually.equal(id);
-        });
-
-        it("should return a rejected promise when the given name matches several users", function () {
-            const sut = factory(config);
-            const veryCommonLastName = "Smith";
-            const stub = getStub(veryCommonLastName, [1, 2]);
-
-            return expect(sut.getId(stub, veryCommonLastName))
-                .to.be.rejected;
-        });
-
-        it("should eventually return an identifier matching the given name", function () {
-            const sut = factory(config);
-            const name = "x";
-            const stub = getStub(name, 42);
-
-            return expect(sut.getId(stub, name))
-                .to.eventually.be.a("number")
-                .and.to.equal(42);
-        });
-
-        it("should eventually output a warning when either user or project is not found by its name", function () {
-            const sut = factory(config);
-            const name = "x";
-            const stub = getStub(name, null);
-
-            return sut.getId(stub, name, true)
-                .then(() => expect(console.warn.calledOnce).to.be.true);
-        });
-
-        after(function () {
-            console.warn.restore();
-        });
-    });
 
     describe("toIds", function () {
         function getHandlerWithFakeFunction(args, value, prop) {
@@ -89,34 +28,42 @@ describe("projectMembers", function () {
             return handler;
         }
 
-        it("should eventually return undefined when criteria is omitted", function () {
+        it("should eventually return an empty array when value is omitted", function () {
             const sut = factory(config);
-            return expect(sut.toIds(null, undefined)).to.eventually.be.undefined;
+            return expect(sut.toIds(null, undefined))
+                .to.eventually.be.an("array")
+                .that.is.empty;
         });
 
-        it("should eventually return undefined when criteria is null", function () {
+        it("should eventually return an empty array when value is null", function () {
             const sut = factory(config);
-            return expect(sut.toIds(null, null)).to.eventually.be.undefined;
+            return expect(sut.toIds(null, null))
+                .to.eventually.be.an("array")
+                .that.is.empty;
         });
 
-        it("should eventually return undefined when criteria is a boolean (false)", function () {
+        it("should eventually return an empty array when value is a boolean (false)", function () {
             const sut = factory(config);
-            return expect(sut.toIds(null, false)).to.eventually.be.undefined;
+            return expect(sut.toIds(null, false))
+                .to.eventually.be.an("array")
+                .that.is.empty;
         });
 
-        it("should eventually return undefined when criteria is a boolean (true)", function () {
+        it("should eventually return an empty array when value is a boolean (true)", function () {
             const sut = factory(config);
-            return expect(sut.toIds(null, true)).to.eventually.be.undefined;
+            return expect(sut.toIds(null, true))
+                .to.eventually.be.an("array")
+                .that.is.empty;
         });
 
-        it("should eventually return a one-item array when criteria is a number", function () {
+        it("should eventually return a one-item array when value is a number", function () {
             const sut = factory(config);
             const id = 1;
 
             return expect(sut.toIds(null, id)).to.eventually.be.an("array").and.to.deep.equal([id]);
         });
 
-        it("should convert criteria to string when it is neither undefined, null, boolean nor integer", function () {
+        it("should convert value to string when it is neither undefined, null, boolean nor integer", function () {
             const sut = factory(config);
             const name = "ABC";
             const handler = getHandlerWithFakeFunction(name, 42, "getByName");
@@ -126,14 +73,14 @@ describe("projectMembers", function () {
                 .and.to.deep.equal([42]);
         });
 
-        it("should eventually invoke the filter function when criteria is a string starting with 'where='", function () {
+        it("should eventually invoke the filter function when value is a string starting with 'where='", function () {
             const sut = factory(config);
             const condition = "(FirstName eq 'Adam')";
             const expected = 42;
-            const handler = getHandlerWithFakeFunction(condition, expected, "filter");
+            const handler = getHandlerWithFakeFunction(condition, [{Id: expected}], "filter");
 
             return expect(sut.toIds(handler, `where=${condition}`))
-                .to.eventually.equal(expected);
+                .to.eventually.deep.equal([expected]);
         });
 
         it("should eventually be rejected when no item of the given name is found", function () {
@@ -166,222 +113,128 @@ describe("projectMembers", function () {
         });
     });
 
+    describe("getWhereClause", function () {
+        it("should return an empty string when both projects and users are empty", function () {
+            const sut = factory(config);
+
+            return expect(sut.getWhereClause([], []))
+                .to.be.a("string")
+                .that.is.empty;
+        });
+
+        it("should use the 'eq' operator on users when only one user id is given", function () {
+            const sut = factory(config);
+
+            return expect(sut.getWhereClause([1], []))
+                .to.equal("(User.Id eq 1)");
+        });
+
+        it("should use the 'in' operator on users when several user ids are given", function () {
+            const sut = factory(config);
+
+            return expect(sut.getWhereClause([1, 2], []))
+                .to.equal("(User.Id in (1,2))");
+        });
+
+        it("should use the 'eq' operator on projects when only one project id is given", function () {
+            const sut = factory(config);
+
+            return expect(sut.getWhereClause([], [1]))
+                .to.equal("(Project.Id eq 1)");
+        });
+
+        it("should use the 'in' operator on projects when several project ids are given", function () {
+            const sut = factory(config);
+
+            return expect(sut.getWhereClause([], [1, 2]))
+                .to.equal("(Project.Id in (1,2))");
+        });
+
+        it("should use the 'and' operator when both user and project are given", function () {
+            const sut = factory(config);
+
+            return expect(sut.getWhereClause([1], [2]))
+                .to.equal("(User.Id eq 1)and(Project.Id eq 2)");
+        });
+    });
+
     describe("getItems", function () {
-        function getSUT(users, projects, args, value) {
-            const request = sinon.stub();
-            const retriever = require("targetprocess-api/retrieve")(Object.assign({request}, config));
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {retriever, users, projects}});
+        it("should eventually reject the promise when both users and projects are empty", function () {
+            const sut = factory(config);
 
-            request.rejects();
-            request.withArgs(args).resolves(value);
-
-            return stamp(config);
-        }
-
-        it("should eventually return an array with a single item matching given user name and project id", function () {
-            const name = "Bourne";
-            const id = 1;
-            const args = {
-                method: "GET",
-                uri: `https://${credentials.domain}/api/v1/ProjectMembers/`,
-                qs: {
-                    token: credentials.token,
-                    where: `(User.Id eq ${id})and(Project.Id eq 2)`,
-                    take: 1000
-                },
-                json: true
-            };
-            const expected = {
-                Items: [
-                    {
-                        User: {
-                            Id: id,
-                            FirstName: "Jason",
-                            LastName: name
-                        },
-                        Project: {
-                            Id: 2,
-                            Name: "Treadstone"
-                        },
-                        Role: {
-                            Name: "Developer"
-                        }
-                    }
-                ]
-            };
-            const users = {};
-            const projects = {};
-            const sut = getSUT(users, projects, args, expected);
-            const getId = sinon.stub(sut, "getId");
-            getId.withArgs(users, name).resolves(id);
-            getId.withArgs(projects, 2).resolves(2);
-
-            return expect(sut.getItems(name, 2))
-                .to.eventually.be.an("array")
-                .and.to.deep.equal(expected.Items);
+            return expect(sut.getItems([[], []]))
+                .to.eventually.be.rejected;
         });
 
-        it("should eventually return an array with several items matching the given user name", function () {
-            const name = "Bourne";
-            const id = 1;
-            const args = {
-                method: "GET",
-                uri: `https://${credentials.domain}/api/v1/ProjectMembers/`,
-                qs: {
-                    token: credentials.token,
-                    where: `(User.Id eq ${id})`,
-                    take: 1000
-                },
-                json: true
-            };
-            const expected = {
-                Items: [
-                    {
-                        User: {
-                            Id: id,
-                            FirstName: "Jason",
-                            LastName: name
-                        },
-                        Project: {
-                            Id: 2,
-                            Name: "Treadstone"
-                        },
-                        Role: {
-                            Name: "Developer"
-                        }
-                    },
-                    {
-                        User: {
-                            Id: id,
-                            FirstName: "Jason",
-                            LastName: name
-                        },
-                        Project: {
-                            Id: 3,
-                            Name: "Blackbriar"
-                        },
-                        Role: {
-                            Name: "Developer"
-                        }
-                    }
-                ]
-            };
-            const users = {};
-            const projects = {};
-            const sut = getSUT(users, projects, args, expected);
-            const getId = sinon.stub(sut, "getId");
-            getId.withArgs(users, name).resolves(id);
+        it("should eventually return a 3-elements array whose first two are those given in input", function () {
+            const users = [1];
+            const projects = [2];
+            const items = [];
+            const sut = factory(config);
+            const filter = sinon.stub(sut, "filter");
 
-            return expect(sut.getItems(name))
+            filter.resolves(items);
+            return expect(sut.getItems([users, projects]))
                 .to.eventually.be.an("array")
-                .and.to.deep.equal(expected.Items);
-        });
-
-        it("should return a rejected promise when both project and user names are not valid", function () {
-            const badUserName = "x";
-            const badProjectName = "y";
-            const users = {};
-            const projects = {};
-            const sut = getSUT(users, projects);
-            const getId = sinon.stub(sut, "getId");
-            getId.withArgs(users, badUserName).resolves(null);
-            getId.withArgs(projects, badProjectName).resolves(null);
-
-            return expect(sut.getItems(badUserName, badProjectName))
-                .to.be.rejectedWith(Error);
+                .and.to.deep.equal([users, projects, items]);
         });
     });
 
     describe("show", function () {
-        it("should eventually return a string matching given user and project", function () {
-            const userName = "Bourne";
-            const projectName = "Treadstone";
+        it("should eventually return an array of users ids, projects ids and existing assignments", function () {
             const items = [
                 {
-                    User: {
-                        Id: 1,
-                        FirstName: "Jason",
-                        LastName: userName
-                    },
-                    Project: {
-                        Id: 2,
-                        Name: projectName
-                    },
-                    Role: {
-                        Name: "Developer"
-                    }
+                    User: {Id: 1},
+                    Project: {Id: 2},
+                    Role: {Id: 3}
                 }
             ];
+            const expected = [[1], [2], items];
             const sut = factory(config);
             const getItems = sinon.stub(sut, "getItems");
-            getItems.withArgs(userName, projectName).resolves(items);
+            getItems.withArgs([[1], [2]]).resolves(expected);
 
-            return expect(sut.show(userName, projectName))
+            return expect(sut.show(1, 2))
                 .to.eventually.be.an("array")
-                .and.to.deep.equal(items);
+                .and.to.deep.equal(expected);
         });
     });
 
-    describe("unassign", function () {
-        it("should eventually return a single object when a single user/project couple is given", function () {
-            const userName = "Bourne";
-            const projectName = "Treadstone";
-            const batchRemove = sinon.stub();
-            const remover = {batchRemove};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {remover}});
-            const sut = stamp(config);
-            const getItems = sinon.stub(sut, "getItems");
-            const response = {ResourceType: "ProjectMember", Id: 42};
+    describe("remove", function () {
+        it("should eventually return a 4-elements array whose first three are those given in input", function () {
+            const users = [1];
+            const projects = [2];
+            const items = [{}];
+            const result = {Deleted: [], NotDeleted: []};
+            const sut = factory(config);
+            const batchRemove = sinon.stub(sut.remover, "batchRemove");
 
-            getItems.withArgs(userName, projectName).resolves([
-                {
-                    Id: 42,
-                    User: {Id: 1, FirstName: "Jason", LastName: userName},
-                    Project: {Id: 2, Name: projectName},
-                    Role: {Id: 3, Name: "Developer"}
-                }
-            ]);
+            batchRemove.resolves(result);
+            return expect(sut.remove([users, projects, items]))
+                .to.eventually.be.an("array")
+                .and.to.deep.equal([users, projects, items, result]);
+        });
+    });
 
-            batchRemove.withArgs([42]).resolves(response);
+    describe("noneIsAll", function () {
+        it("should eventually return the input array when it is not empty", function () {
+            const sut = factory(config);
+            const arr = [1, 2, 3];
 
-            return expect(sut.unassign(userName, projectName))
-                .to.eventually.equal(response);
+            return expect(sut.noneIsAll(null, arr))
+                .to.eventually.equal(arr);
         });
 
-        it("should eventually return a compound object when a user/project set is given", function () {
-            const userName = "Bourne";
-            const batchRemove = sinon.stub();
-            const remover = {batchRemove};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {remover}});
-            const sut = stamp(config);
-            const getItems = sinon.stub(sut, "getItems");
-            const response = {
-                Deleted: {Items: []},
-                NotDelete: {Items: []}
+        it("should eventually return a new array when the input array is empty", function () {
+            const sut = factory(config);
+            const arr = [];
+            const handler = {
+                getActive: () => Promise.resolve([1, 2, 3])
             };
 
-            getItems.withArgs(userName).resolves([
-                {
-                    Id: 42,
-                    User: {Id: 10},
-                    Project: {Id: 20},
-                    Role: {Id: 30}
-                },
-                {
-                    Id: 43,
-                    User: {Id: 10},
-                    Project: {Id: 21},
-                    Role: {Id: 30}
-                }
-            ]);
-
-            batchRemove.withArgs([42, 43]).resolves(response);
-
-            return expect(sut.unassign(userName))
-                .to.eventually.deep.equal(response);
+            return expect(sut.noneIsAll(handler, arr))
+                .to.eventually.be.an("array")
+                .and.to.not.equal(arr);
         });
     });
 
@@ -403,94 +256,39 @@ describe("projectMembers", function () {
         });
     });
 
-    describe("create", function () {
-        it("should eventually assign the given user to the given project", function () {
-            const create = sinon.stub();
-            const creator = {create};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {creator}});
-            const sut = stamp(config);
-            const response = {ResourceType: "ProjectMember", Id: 456};
+    describe("makeBatch", function () {
+        it("should throw an Error when multiple roles are given", function () {
+            const sut = factory(config);
+            const makeBatchWithMultipleRoles = function () {
+                sut.makeBatch([null, null, [1, 2]]);
+            };
 
-            create.withArgs({
-                User: {Id: 1},
-                Project: {Id: 2},
-                Role: {Id: 3}
-            }).resolves(response);
-
-            return expect(sut.create(1, 2, 3))
-                .to.eventually.equal(response);
+            return expect(makeBatchWithMultipleRoles).to.throw(Error);
         });
 
-        it("shold eventually assign the project to all users when no user is specified", function () {
-            const user = undefined;
-            const project = 2;
-            const role = 3;
-            const batchCreate = sinon.stub();
-            const creator = {batchCreate};
-            const getActive = sinon.stub();
-            const users = {getActive};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {creator, users}});
-            const sut = stamp(config);
-            const batch = [
-                {User: {Id: 10}, Project: {Id: project}, Role: {Id: role}},
-                {User: {Id: 11}, Project: {Id: project}, Role: {Id: role}},
-                {User: {Id: 12}, Project: {Id: project}, Role: {Id: role}}
-            ];
+        it("should make a batch whose length is the product of the number of users by the number of projects", function () {
+            const sut = factory(config);
+            const users = [1, 2, 3];
+            const projects = [4, 5];
+            const roles = [];
 
-            getActive.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
-            batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
-
-            sut.create(user, project, role);
-            return expect(batchCreate.calledWith(batch));
-        });
-
-        it("shold eventually assign a user to all projects when no project is specified", function () {
-            const user = 1;
-            const project = undefined;
-            const role = 3;
-            const batchCreate = sinon.stub();
-            const creator = {batchCreate};
-            const getActive = sinon.stub();
-            const projects = {getActive};
-            const stampit = require("@stamp/it");
-            const stamp = stampit(factory, {props: {creator, projects}});
-            const sut = stamp(config);
-            const batch = [
-                {User: {Id: user}, Project: {Id: 10}, Role: {Id: role}},
-                {User: {Id: user}, Project: {Id: 11}, Role: {Id: role}},
-                {User: {Id: user}, Project: {Id: 12}, Role: {Id: role}}
-            ];
-
-            getActive.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
-            batchCreate.resolves([{Id: 10}, {Id: 11}, {Id: 12}]);
-
-            sut.create(user, project, role);
-            return expect(batchCreate.calledWith(batch));
+            return expect(sut.makeBatch([users, projects, roles]))
+                .to.be.an("array")
+                .and.to.have.lengthOf(users.length * projects.length);
         });
     });
 
     describe("assign", function () {
-        it("should return a rejected promise when both project and user name are not valid", function () {
-            const sut = factory(config);
-            const getId = sinon.stub(sut, "getId");
-
-            getId.resolves(undefined);
-
-            return expect(sut.assign(undefined, "Project", "Role")).to.be.rejected;
-        });
-
         it("should eventually remove prior assignments and create new ones", function () {
             const sut = factory(config);
             const unassign = sinon.stub(sut, "unassign");
             const create = sinon.stub(sut, "create");
 
-            unassign.withArgs(1, 2).resolves({});
+            unassign.withArgs(1, 2).resolves([[1], [2], [], {}]);
             create.resolves({});
 
             sut.assign(1, 2, 3);
-            return expect(unassign.calledWith(1, 2) && create.calledWith(1, 2, 3));
+            return expect(unassign.calledWith(1, 2) && create.calledWith(3, [[1], [2]]));
         });
     });
 });
