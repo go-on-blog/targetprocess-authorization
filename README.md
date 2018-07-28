@@ -63,12 +63,23 @@ $ authorization-show --help
   $ authorization-show -d mycompany.tpondemand.com -t <token> -u Spielberg -p "Indiana Jones"
   ```
 
-* Show the list of all users assigned to one particular project
+* Show the list of all users assigned to one particular project.  
+  (Do not specify the user in this case.)
   ```bash
   $ authorization-show -d mycompany.tpondemand.com -t <token> -p "Indiana Jones"
   ```
 
 **Unassign**
+
+* Unassign a person from all projects.
+  ```bash
+  $ authorization-unassign -d mycompany.tpondemand.com -t <token> -u "Spielberg"
+  ```
+
+* Unassign everyon from the projects matching given filter.
+  ```bash
+  $ authorization-unassign -d mycompany.tpondemand.com -t <token> -p "where=(IsProduct eq 'true')"
+  ```
 
 **Assign**
 
@@ -90,9 +101,10 @@ $ authorization-show --help
   $ authorization-assign -d mycompany.tpondemand.com -t <token> -u Spielberg -r director
   ```
 
-* Assign all users to the projects matching given filtering conditions with the specified role. See [Filters](#filters) for more details on filtering conditions.
+* Assign all users to the projects matching given filter with the specified role.  
+  See [Filters](#filters) for more details on filtering conditions.
   ```bash
-  $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "where=(IsProduct eq 'true')" -r developer
+  $ authorization-assign -d mycompany.tpondemand.com -t <token> -p "where=(IsProduct eq 'true')" -r PO
   ```
 
 ### Filters
@@ -101,8 +113,8 @@ Filtering conditions must be specified using [Targetprocess API syntax](https://
 
 Quick summary:
 
-* The operator 'and' is case-sensitive, so it has to be in lower case (e.g. 'AND' or 'And' will not work).
+* The operator `and` is case-sensitive, so it has to be in lower case (e.g. `AND` or `And` will not work).
 * In order to combine several rules you have to use logical grouping with brackets (ie "(" and ")").
-* The operator 'or' is not supported.
+* The operator `or` is not supported.
 * Use single quotes to enclose non-numeric values.
 * Escaping of single quote symbol in values can be done using preceding backslash: `where=Name contains '\''`
