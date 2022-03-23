@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@stamp/it": "^1.0.3",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.6",
     "targetprocess-api": ">=0.3.0"
   },
   "devDependencies": {
