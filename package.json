@@ -14,7 +14,9 @@
     "lint": "jslint --edition=latest \"lib/**/*.js\"",
     "lint:bin": "jslint --edition=latest \"bin/**/*.js\"",
     "lint:test": "jslint --edition=latest \"test/**/*.js\"",
-    "test": "npm run lint:test && npm run lint && mocha test --recursive"
+    "test": "npm run lint:test && npm run lint && mocha test --recursive",
+    "prepare": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -25,8 +27,9 @@
   },
   "dependencies": {
     "@stamp/it": "^1.0.3",
-    "minimist": "^1.2.0",
-    "targetprocess-api": ">=0.3.0"
+    "minimist": "^1.2.6",
+    "targetprocess-api": ">=0.3.0",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -39,5 +42,6 @@
   },
   "engines": {
     "node": ">=6.0.0"
-  }
+  },
+  "snyk": true
 }
